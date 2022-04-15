@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+{% block content %}
+    <div>
+        <h1>agrege un nuevo producto</h1>
+    </div>
+
+    <div>
+
+        {% block addForm %}{% endblock %}
+    </div>
+
+    {% if products %}
+
+        <table>
+            <thead>
+                <tr>
+                    <td>id</td>
+                    <td>nombre</td>
+                    <td>descripcion</td>
+                    <td>precio</td>
+                </tr>
+            </thead>
+
+        {% for product in products %}
+            <form action="{{ path('delete_product') }}">
+            <tbody>
+            <tr>
+                <td>{{ product.id }}</td>
+                <input type="hidden" name="product_id_delete" value="{{ product.id }}"/>
+                <td>{{ product.name }}</td>
+                <input type="hidden" name="product_name_delete" value="{{ product.name }}"/>
+                <td>{{ product.description }}</td>
+                <input type="hidden" name="product_description_delete" value="{{ product.description }}"/>
+                <td>{{ product.price }}</td>
+                <input type="hidden" name="product_price_delete" value="{{ product.price }}"/>
+                <td><button type="submit">Eliminar</button></td>
+            </tr>
+            </tbody>
+            </form>
+            </table>
+        {% endfor %}
+
+    {% endif %}
+{% endblock %}

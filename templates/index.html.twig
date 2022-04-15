@@ -1,0 +1,29 @@
+{% extends "indexPageLayout.html.twig" %}
+
+{% block addForm %}
+{{ form_start(form) }}
+    <div class="row">
+        {{ form_row(form.name) }}
+        <div class="name-error">
+            {{ message['name'] }}
+        </div>
+    </div>
+    <div class="row">
+        {{ form_row(form.description) }}
+        <div class="description-error">
+            {{ message['description'] }}
+        </div>
+    </div>
+    <div class="row">
+        {{ form_row(form.price) }}
+        <div class="price-error">
+            {{ message['price'] }}
+        </div>
+    </div>
+    <div class="row">
+        {{ form_row(form.guardar) }}
+    </div>
+
+{{ form_end(form)}}
+
+{% endblock %}
