@@ -7,6 +7,8 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 
 /**
  * @method User|null find($id, $lockMode = null, $lockVersion = null)
@@ -16,9 +18,12 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class UserRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private UserPasswordHasherInterface $hasher;
+
+    public function __construct(ManagerRegistry $registry, UserPasswordHasherInterface $hasher)
     {
         parent::__construct($registry, User::class);
+        $this->hasher = $hasher;
     }
 
     /**
@@ -43,6 +48,25 @@ class UserRepository extends ServiceEntityRepository
         if ($flush) {
             $this->_em->flush();
         }
+    }
+
+    public function create($data): User
+    {
+        // TODO agregar metodo de servicio el cual formate las variables y cree el usuario listo para lo utilice este metodo
+        $user = new User();
+        $user->setFirstName($data->first_name);
+        $user->setLastName($data->last_name);
+        $user->setEmail($data->email);
+        $password =$this->hasher->hashPassword($user,$data->password);
+        $user->setPassword($password);
+        $user->setPostalCode($data->postal_code);
+        $user->setShipingAddress($data->shipping_address);
+
+        $this->_em->persist($user);
+        $this->_em->flush();
+
+        return $user;
+
     }
 
     // /**

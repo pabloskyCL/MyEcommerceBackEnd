@@ -8,6 +8,7 @@ use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Doctrine\Persistence\ManagerRegistry;
+use mysql_xdevapi\Exception;
 
 /**
  * @method Product|null find($id, $lockMode = null, $lockVersion = null)
@@ -22,28 +23,16 @@ class ProductRepository extends ServiceEntityRepository
         parent::__construct($registry, Product::class);
     }
 
-    /**
-     * @throws ORMException
-     * @throws OptimisticLockException
-     */
-    public function add(Product $entity, bool $flush = true): void
-    {
-        $this->_em->persist($entity);
-        if ($flush) {
-            $this->_em->flush();
-        }
-    }
 
     /**
-     * @throws ORMException
-     * @throws OptimisticLockException
+     * @throws \Doctrine\DBAL\Exception
      */
-    public function remove(Product $entity, bool $flush = true): void
-    {
-        $this->_em->remove($entity);
-        if ($flush) {
-            $this->_em->flush();
-        }
+    public function getAvailableProducts($available = 1){
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = 'SELECT * FROM product WHERE in_stock = :available';
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery(['available'=> $available]);
+        return $resultSet->fetchAllAssociative();
     }
 
     /**
