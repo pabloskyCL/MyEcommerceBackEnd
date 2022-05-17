@@ -14,9 +14,9 @@ class homeService {
         $this->entityManager = $entityManager;
     }
 
-    public function getAvailableProducts(){
-        $products = $this->entityManager->getRepository(Product::class)->getAvailableProducts();
-       return $products;
+    public function getAvailableProducts(): array
+    {
+        return $this->entityManager->getRepository(Product::class)->getAvailableProducts();
 
     }
 

@@ -5,10 +5,8 @@ namespace App\Repository;
 use App\Entity\Product;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\ParameterType;
-use Doctrine\ORM\OptimisticLockException;
-use Doctrine\ORM\ORMException;
+
 use Doctrine\Persistence\ManagerRegistry;
-use mysql_xdevapi\Exception;
 
 /**
  * @method Product|null find($id, $lockMode = null, $lockVersion = null)
@@ -27,7 +25,8 @@ class ProductRepository extends ServiceEntityRepository
     /**
      * @throws \Doctrine\DBAL\Exception
      */
-    public function getAvailableProducts($available = 1){
+    public function getAvailableProducts($available = 1): array
+    {
         $conn = $this->getEntityManager()->getConnection();
         $sql = 'SELECT * FROM product WHERE in_stock = :available';
         $stmt = $conn->prepare($sql);
