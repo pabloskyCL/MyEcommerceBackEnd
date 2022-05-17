@@ -2,15 +2,18 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Service\UserService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Security;
-use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
@@ -33,7 +36,8 @@ class AuthController extends AbstractController
      *@Route("/register", name="user.register")
      *
      */
-    public function registerNewUser(Request $request,UserService $userService){
+    public function registerNewUser(Request $request,UserService $userService): JsonResponse
+    {
 
         $jsonData = json_decode($request->getContent());
         $user = $this->userRepository->create($jsonData);
@@ -54,9 +58,19 @@ class AuthController extends AbstractController
         if(!$currentUser){
            $isAuthenticated = false;
         }
-        $user = $this->serializer->serialize($currentUser, 'json');
 
-        return new JsonResponse(['user'=> $user,
+        $encoder = new JsonEncoder();
+        $defaultContext = [
+            AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER=> function ($object,$format,$context){
+            return $object;
+            }
+        ];
+
+        $normalizer = new ObjectNormalizer(null,null,null,null,null,null,$defaultContext);
+        $serializer = new Serializer([$normalizer],[$encoder]);
+        $user = $serializer->serialize($currentUser,'json');
+
+        return $this->json(['user'=> $user,
             'isAuth'=>$isAuthenticated],200);
     }
 }

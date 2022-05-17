@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @Route("/api/products")
+ * @Route("/products")
  */
 class HomeController extends AbstractController{
 
