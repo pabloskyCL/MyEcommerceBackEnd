@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Service\homeService;
+use App\Interfaces\Crud\IAvailableProducts;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,8 +17,8 @@ class HomeController extends AbstractController{
      * @Route ("/ListProducts", name="list_products")
      *
      */
-    public function getProductsAction(HomeService $homeService):Response{
-        $products = $homeService->getAvailableProducts();
+    public function getProductsAction(IAvailableProducts $AvailableProducts):Response{
+        $products = $AvailableProducts->getAvailableProducts();
         return new JsonResponse($products);
     }
 

@@ -4,17 +4,16 @@ namespace App\Service;
 
 
 use App\Entity\ShoppingCart;
-use App\Entity\User;
+use App\Interfaces\Auth\IAuthenticatedUser;
+use App\Interfaces\ShoppingCart\IShoppingCart;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Security\Core\Security;
 
-class ShoppingCartService {
+class ShoppingCartService implements IShoppingCart {
 
-    private $entityManager;
-    private $security;
+    private EntityManagerInterface $entityManager;
+    private IAuthenticatedUser $security;
 
-    public function __construct(EntityManagerInterface $entityManager, Security $security)
+    public function __construct(EntityManagerInterface $entityManager, IAuthenticatedUser $security)
     {
         $this->entityManager = $entityManager;
         $this->security = $security;
@@ -22,7 +21,7 @@ class ShoppingCartService {
 
     public function addToCart($data): array
     {
-        $user = $this->security->getUser();
+        $user = $this->security->getAuthenticatedUser();
         $response = null;
         $isAddedProduct = false;
 
@@ -38,19 +37,19 @@ class ShoppingCartService {
 
     public function getCartByUser(): array
     {
-        $user = $this->security->getUser();
+        $user = $this->security->getAuthenticatedUser();
         return $this->entityManager->getRepository(ShoppingCart::class)->getCartByUser($user->getId());
     }
 
     public function updateProductQuantity($product_id): bool
     {
-        $user = $this->security->getUser();
+        $user = $this->security->getAuthenticatedUser();
         return $this->entityManager->getRepository(ShoppingCart::class)->addProductFromCart($product_id, $user->getId());
     }
 
     public function deleteFromCart($product_id): bool
     {
-        $user = $this->security->getUser();
+        $user = $this->security->getAuthenticatedUser();
         $cartRepository = $this->entityManager->getRepository(ShoppingCart::class);
         $product = $cartRepository->findOneBy(['idProduct' => $product_id, 'idUser'=> $user->getId()]);
         if($product && ($product->getCantidad() > 1)){

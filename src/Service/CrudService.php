@@ -3,11 +3,14 @@
 namespace App\Service;
 
 use App\Entity\Product;
+use App\Interfaces\Crud\IAddProduct;
+use App\Interfaces\Crud\IAvailableProducts;
+use App\Interfaces\FormValidator\IValidateForm;
 use Doctrine\ORM\EntityManagerInterface;
 
-class AddProductService
+class CrudService implements IValidateForm, IAddProduct, IAvailableProducts
 {
-    private $entityManager;
+    private EntityManagerInterface $entityManager;
 
     public function __construct(EntityManagerInterface $entityManager)
     {
@@ -16,6 +19,7 @@ class AddProductService
 
     public function ValidateForm(Product $product): array
     {
+        //esta validación es provicional ya que hacer una
         $isValid = true;
         $errorMessages = ['name'=>'','description'=>'','price'=>''];
         if($product->getName() == null ||  strlen($product->getName()) < 3 ){
@@ -40,5 +44,11 @@ class AddProductService
     public function addProduct(Product $product): array
     {
         return $isProductAdded = $this->entityManager->getRepository(Product::class)->addProduct($product);
+    }
+
+    public function getAvailableProducts(): array
+    {
+        return $this->entityManager->getRepository(Product::class)->getAvailableProducts();
+
     }
 }
